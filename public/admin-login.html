@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Trannity</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      border-radius: 20px;
+      padding: 35px;
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.6) !important;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      border-radius: 12px !important;
+      padding: 12px 15px !important;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body style="background: linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+
+  <main style="width: 100%; max-width: 420px; padding: 20px;">
+    <div class="glass-card">
+      <div style="text-align: center; margin-bottom: 25px;">
+        <div style="font-size: 2.2rem; margin-bottom: 6px;">🔐</div>
+        <h2 style="margin: 0; color: #1F2937;">Admin Portal</h2>
+        <p style="color: #6B7280; font-size: 0.9rem; margin-top: 4px;">Sign in to manage campaign & payment settings</p>
+      </div>
+
+      <div id="error-alert" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #991B1B; padding: 10px 14px; border-radius: 10px; font-size: 0.88rem; margin-bottom: 20px;"></div>
+
+      <form id="admin-login-form">
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">Username</label>
+          <input type="text" id="username" class="glass-input" required placeholder="admin" autocomplete="username">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 25px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">Password</label>
+          <input type="password" id="password" class="glass-input" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="login-btn" class="btn" style="width: 100%; font-size: 1.05rem; padding: 14px; border-radius: 12px; cursor: pointer;">
+          Sign In →
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const loginBtn = document.getElementById('login-btn');
+      const errorAlert = document.getElementById('error-alert');
+      
+      errorAlert.style.display = 'none';
+      loginBtn.disabled = true;
+      loginBtn.innerText = 'Authenticating...';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Cookie is automatically set by server. Redirect to admin panel:
+          window.location.href = '/admin.html';
+        } else {
+          errorAlert.innerText = data.error || 'Invalid credentials.';
+          errorAlert.style.display = 'block';
+          loginBtn.disabled = false;
+          loginBtn.innerText = 'Sign In →';
+        }
+      } catch (err) {
+        errorAlert.innerText = 'Server connection error. Please try again.';
+        errorAlert.style.display = 'block';
+        loginBtn.disabled = false;
+        loginBtn.innerText = 'Sign In →';
+      }
+    });
+  </script>
+</body>
+</html>

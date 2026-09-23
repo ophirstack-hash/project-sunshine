@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You | Trannity - Project Sunshine</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .glass-header {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      border-radius: 20px;
+      padding: 35px 30px;
+    }
+
+    .summary-box {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(139, 38, 62, 0.15);
+      border-radius: 14px;
+      padding: 20px;
+      margin: 25px 0;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .share-box {
+      background: rgba(139, 38, 62, 0.04);
+      border: 1px solid rgba(139, 38, 62, 0.2);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    .share-input-wrapper {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.8) !important;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,0,0,0.12) !important;
+      border-radius: 10px !important;
+      padding: 10px 14px !important;
+      width: 100%;
+    }
+  </style>
+</head>
+<body style="background: linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%); min-height: 100vh;">
+
+  <header class="glass-header">
+    <div class="container nav-wrapper" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+      <a href="/" class="logo" style="font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--primary, #8B263E);"> Trannity</a>
+      <a href="/" class="btn btn-secondary" style="padding: 8px 18px; border-radius: 8px; text-decoration: none;">Return Home</a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 650px; padding: 40px 20px 60px;">
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 3.5rem; margin-bottom: 10px;">🎉</div>
+      <h1 style="margin: 0; color: #1F2937; font-size: 2rem;">Thank You for Your Generosity!</h1>
+      <p style="color: #6B7280; font-size: 1.05rem; margin-top: 8px;">
+        Your contribution to <strong>Project Sunshine</strong> makes a direct, meaningful impact.
+      </p>
+
+      <!-- Transaction Summary Card -->
+      <div class="summary-box" style="text-align: left;">
+        <div class="summary-row">
+          <span style="color: #6B7280;">Amount Initiated:</span>
+          <strong id="summary-amount" style="color: var(--primary, #8B263E); font-size: 1.1rem;">$0.00</strong>
+        </div>
+        <div class="summary-row">
+          <span style="color: #6B7280;">Payment Method:</span>
+          <strong id="summary-method" style="color: #1F2937;">Direct Transfer</strong>
+        </div>
+        <div class="summary-row">
+          <span style="color: #6B7280;">Reference / ID:</span>
+          <strong id="summary-id" style="color: #1F2937;">TRN-XXXXXX</strong>
+        </div>
+        <div class="summary-row">
+          <span style="color: #6B7280;">Status:</span>
+          <span id="summary-status" style="background: #FEF3C7; color: #92400E; font-weight: 700; font-size: 0.82rem; padding: 3px 10px; border-radius: 12px;">
+            Pending Verification
+          </span>
+        </div>
+      </div>
+
+      <!-- Referral Sharing Option -->
+      <div class="share-box">
+        <h3 style="margin: 0 0 6px; color: var(--primary, #8B263E); font-size: 1.1rem;">Multiply Your Impact 🚀</h3>
+        <p style="margin: 0; color: #6B7280; font-size: 0.9rem;">
+          Share your custom referral link with friends and colleagues to help us reach our campaign target!
+        </p>
+        <div class="share-input-wrapper">
+          <input type="text" id="referral-link" class="glass-input" readonly value="https://trannity.org/?r=DONOR">
+          <button type="button" id="copy-ref-btn" class="btn" style="padding: 10px 18px; border-radius: 10px; cursor: pointer; white-space: nowrap;">
+            Copy Link
+          </button>
+        </div>
+      </div>
+
+      <a href="/" class="btn btn-secondary" style="display: inline-block; margin-top: 30px; padding: 12px 28px; border-radius: 10px; text-decoration: none;">
+        Back to Main Campaign Page
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // 1. Read URL query parameters passed from payment submission redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlDonationId = urlParams.get('donationId') || urlParams.get('donation_id');
+    const urlRefCode = urlParams.get('ref') || urlParams.get('r');
+
+    // 2. Read session storage summary
+    const rawSummary = sessionStorage.getItem('last_donation_summary');
+    let summary = {};
+    if (rawSummary) {
+      try { summary = JSON.parse(rawSummary); } catch (e) {}
+    }
+
+    // Populate transaction fields
+    if (summary.amount) {
+      document.getElementById('summary-amount').innerText = `$${parseFloat(summary.amount).toLocaleString()}`;
+    }
+    document.getElementById('summary-method').innerText = summary.method || 'Crypto / Direct Transfer';
+    document.getElementById('summary-id').innerText = urlDonationId || summary.donationId || 'TRN-COMPLETED';
+
+    if (summary.status && summary.status.includes('Completed')) {
+      const statusEl = document.getElementById('summary-status');
+      statusEl.innerText = 'Completed & Verified';
+      statusEl.style.background = '#D1FAE5';
+      statusEl.style.color = '#065F46';
+    }
+
+    // 3. Resolve the donor's unique generated referral code
+    // Prioritize URL query param, then session storage, then local storage
+    const activeRefCode = urlRefCode || summary.referralCode || localStorage.getItem('trannity_user_ref_code') || 'SUNSHINE';
+
+    // 4. Generate dynamic share link matching current domain
+    const refUrl = `${window.location.origin}/?r=${encodeURIComponent(activeRefCode)}`;
+    document.getElementById('referral-link').value = refUrl;
+
+    // 5. Copy link handler
+    document.getElementById('copy-ref-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(refUrl);
+      const btn = document.getElementById('copy-ref-btn');
+      btn.innerText = 'Copied!';
+      setTimeout(() => btn.innerText = 'Copy Link', 2000);
+    });
+  </script>
+</body>
+</html>

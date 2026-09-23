@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donate | Trannity - Project Sunshine</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* =========================================
+       APPLE LIQUID GLASSMORPHISM STYLES
+       ========================================= */
+    .glass-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      border-radius: var(--radius-lg, 20px);
+      padding: 30px;
+    }
+
+    /* Animated Liquid Quick-Select Buttons */
+    .amount-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .amount-btn {
+      position: relative;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-md, 12px);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--primary, #8B263E);
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .amount-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .amount-btn:hover::before {
+      left: 100%;
+    }
+
+    .amount-btn:hover {
+      transform: translateY(-3px) scale(1.01);
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .amount-btn.active {
+      background: var(--primary, #8B263E);
+      color: #FFFFFF;
+      border-color: var(--primary, #8B263E);
+      box-shadow: 0 10px 25px rgba(139, 38, 62, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.6) !important;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      border-radius: 12px !important;
+      padding: 14px 16px !important;
+      width: 100%;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+
+    .glass-input:focus {
+      outline: none;
+      border-color: var(--primary, #8B263E) !important;
+      box-shadow: 0 0 0 3px rgba(139, 38, 62, 0.15);
+    }
+
+    .donate-layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 850px) {
+      .donate-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body style="background: linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%); min-height: 100vh;">
+
+  <!-- Restored Navigation Header -->
+  <header class="glass-header">
+    <div class="container nav-wrapper" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+      <a href="/" class="logo" style="font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--primary, #8B263E);"> Trannity</a>
+      <a href="/" class="btn btn-secondary" style="padding: 8px 18px; border-radius: 8px; text-decoration: none;">Back to Campaign</a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1100px; padding: 40px 20px 60px;">
+    
+    <!-- Hero Banner -->
+    <div style="text-align: center; max-width: 700px; margin: 0 auto 30px;">
+      <h1 style="font-size: 2.2rem; margin-bottom: 12px; color: #1F2937;">Your Generosity Changes Lives</h1>
+      <p style="color: var(--text-muted, #6B7280); font-size: 1.1rem; line-height: 1.6;">
+        100% of your donation directly powers Project Sunshine holiday relief kits.
+      </p>
+    </div>
+
+    <div id="referral-banner" class="referral-banner" style="margin-bottom: 25px;"></div>
+
+    <div class="donate-layout">
+      
+      <!-- Contribution Selection Form -->
+      <div class="glass-card">
+        <form id="donation-tier-form">
+          <h2 style="margin-bottom: 20px; font-size: 1.4rem; color: var(--primary, #8B263E);">Select Giving Option</h2>
+
+          <!-- Animated Deposit Amount Buttons -->
+          <div class="amount-grid">
+            <button type="button" class="amount-btn active" data-value="2500">$2,500</button>
+            <button type="button" class="amount-btn" data-value="5000">$5,000</button>
+            <button type="button" class="amount-btn" data-value="10000">$10,000</button>
+            <button type="button" class="amount-btn" data-value="25000">$25,000</button>
+          </div>
+
+          <div class="form-group" style="margin-top: 25px;">
+            <label for="custom-amount" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">Or Enter Custom Amount ($ USD):</label>
+            <input type="number" id="custom-amount" class="glass-input" placeholder="e.g. 500" min="10">
+          </div>
+
+          <div class="trust-box" style="margin: 25px 0; font-size: 0.88rem; color: #4B5563; background: rgba(255,255,255,0.45); padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); line-height: 1.5;">
+            🔒 <strong>Payment Security Disclaimer:</strong> Your donation session will be initialized securely. Raw credit card data is handled exclusively through compliant payment gateways and is never stored on our servers.
+          </div>
+
+          <button type="submit" class="btn" style="width: 100%; font-size: 1.15rem; padding: 16px; border-radius: 12px; cursor: pointer; transition: transform 0.2s ease;">
+            Proceed to Secure Checkout →
+          </button>
+        </form>
+      </div>
+
+      <!-- Project Sunshine Impact Sidebar -->
+      <div class="donate-sidebar">
+        <div class="glass-card" style="padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <div class="card-image-wrapper" style="height: 210px; overflow: hidden;">
+            <img src="/images/table-filled-with-food.jpeg" alt="Holiday food packages" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="padding: 24px;">
+            <h3 style="font-size: 1.25rem; margin-bottom: 8px; color: #1F2937;">Project Sunshine Relief</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted, #6B7280); line-height: 1.55;">
+              Directly supporting weekend food kits, warm clothing, and family holiday meals across local communities.
+            </p>
+          </div>
+        </div>
+
+        <div class="glass-card" style="padding: 20px 24px;">
+          <h4 style="margin-bottom: 10px; color: var(--primary, #8B263E); font-size: 1.05rem;">✨ Direct Impact Breakdown</h4>
+          <ul style="padding-left: 18px; font-size: 0.88rem; color: #4B5563; line-height: 1.7;">
+            <li><strong>$2,500:</strong> Feeds up to 50 families for a week</li>
+            <li><strong>$5,000:</strong> Provides 100 holiday relief kits</li>
+            <li><strong>$10,000+:</strong> Funds essential community food programs</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/js/referral.js"></script>
+  <script>
+    let selectedAmount = 2500;
+    const amountBtns = document.querySelectorAll('.amount-btn');
+    const customInput = document.getElementById('custom-amount');
+    
+    amountBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        amountBtns.forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        selectedAmount = parseFloat(e.currentTarget.dataset.value);
+        customInput.value = '';
+      });
+    });
+
+    customInput.addEventListener('input', (e) => {
+      if (e.target.value) {
+        selectedAmount = parseFloat(e.target.value);
+        amountBtns.forEach(b => b.classList.remove('active'));
+      }
+    });
+
+    document.getElementById('donation-tier-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      if (!selectedAmount || selectedAmount <= 0) {
+        alert('Please enter or select a valid amount.');
+        return;
+      }
+
+      // Store selected donation amount locally for payment processing
+      sessionStorage.setItem('donation_amount', selectedAmount);
+      
+      window.location.href = '/checkout.html';
+    });
+  </script>
+</body>
+</html>

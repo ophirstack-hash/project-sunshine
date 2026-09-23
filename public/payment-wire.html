@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank Wire Instructions | Trannity</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .glass-header {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      border-radius: 20px;
+      padding: 30px;
+    }
+
+    .bank-details-box {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(139, 38, 62, 0.2);
+      border-radius: 14px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.6) !important;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      border-radius: 12px !important;
+      padding: 12px 15px !important;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body style="background: linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%); min-height: 100vh;">
+
+  <header class="glass-header">
+    <div class="container nav-wrapper" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+      <a href="/" class="logo" style="font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--primary, #8B263E);"> Trannity</a>
+      <a href="/checkout.html" class="btn btn-secondary" style="padding: 8px 18px; border-radius: 8px; text-decoration: none;">← Back</a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 680px; padding: 40px 20px 60px;">
+    <div class="glass-card">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 2.5rem; margin-bottom: 8px;">🏛️</div>
+        <h2 style="margin: 0; color: #1F2937;">Bank Wire Instructions</h2>
+        <p style="color: #6B7280; margin-top: 6px; font-size: 0.95rem;">
+          Please transfer <strong id="wire-amount" style="color: var(--primary, #8B263E);">$0.00</strong> using the bank details below.
+        </p>
+      </div>
+
+      <!-- Bank Details Box -->
+      <div class="bank-details-box">
+        <div class="detail-row">
+          <span style="color: #6B7280;">Bank Name:</span>
+          <strong id="display-bank-name" style="color: #1F2937;">Loading...</strong>
+        </div>
+        <div class="detail-row">
+          <span style="color: #6B7280;">Account Name:</span>
+          <strong id="display-account-name" style="color: #1F2937;">Loading...</strong>
+        </div>
+        <div class="detail-row">
+          <span style="color: #6B7280;">Account Number:</span>
+          <strong id="display-account-number" style="color: #1F2937;">Loading...</strong>
+        </div>
+        <div class="detail-row">
+          <span style="color: #6B7280;">SWIFT / BIC Code:</span>
+          <strong id="display-swift-code" style="color: #1F2937;">Loading...</strong>
+        </div>
+        <div class="detail-row">
+          <span style="color: #6B7280;">Routing Number:</span>
+          <strong id="display-routing-number" style="color: #1F2937;">Loading...</strong>
+        </div>
+        <div class="detail-row">
+          <span style="color: #6B7280;">Transfer Reference:</span>
+          <strong id="transfer-ref" style="color: var(--primary, #8B263E);">SUN-XXXX</strong>
+        </div>
+      </div>
+
+      <div style="background: rgba(255,243,205,0.7); border: 1px solid #FFEBAA; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; color: #856404; margin-bottom: 25px;">
+        ⚠️ <strong>Important:</strong> Please include the <strong>Transfer Reference</strong> in your bank transaction description/memo so we can identify your donation.
+      </div>
+
+      <!-- Submit Payment Confirmation -->
+      <form id="wire-confirm-form">
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">
+            Bank Reference / Transaction ID (Optional)
+          </label>
+          <input type="text" id="bank_reference" class="glass-input" placeholder="e.g., Wire Ref #123456">
+        </div>
+
+        <button type="submit" id="confirm-btn" class="btn" style="width: 100%; font-size: 1.1rem; padding: 16px; border-radius: 12px; cursor: pointer;">
+          I Have Made the Transfer →
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Load donor data saved from checkout.html
+    const rawData = sessionStorage.getItem('donor_checkout_data');
+    if (!rawData) {
+      window.location.href = '/donate.html';
+    }
+
+    const donorData = JSON.parse(rawData);
+
+    // Display Amount
+    document.getElementById('wire-amount').innerText = `$${parseFloat(donorData.amount).toLocaleString()}`;
+
+    // Generate unique reference ID
+    const refCode = 'SUN-' + Math.floor(100000 + Math.random() * 900000);
+    document.getElementById('transfer-ref').innerText = refCode;
+
+    // Submit pending wire donation to server
+    document.getElementById('wire-confirm-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const confirmBtn = document.getElementById('confirm-btn');
+      confirmBtn.disabled = true;
+      confirmBtn.innerText = 'Submitting...';
+
+      const payload = {
+      ...donorData,
+      payment_status: 'pending',
+      payment_reference: document.getElementById('bank_reference').value || refCode,
+      system_reference: refCode,
+      referral_code: localStorage.getItem('trannity_ref_code') || null
+    };
+
+      try {
+        const response = await fetch('/api/donate/private-submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          sessionStorage.setItem('last_donation_summary', JSON.stringify({
+            donationId: data.donationId,
+            amount: payload.amount,
+            method: 'Bank Wire Transfer',
+            status: 'Pending Admin Verification'
+          }));
+          window.location.href = `/thank-you.html?donationId=${data.donationId}&ref=${data.referralCode}`;
+        } else {
+          alert(data.error || 'Could not record donation. Please try again.');
+          confirmBtn.disabled = false;
+          confirmBtn.innerText = 'I Have Made the Transfer →';
+        }
+      } catch (err) {
+        alert('Server connection error. Please try again.');
+        confirmBtn.disabled = false;
+        confirmBtn.innerText = 'I Have Made the Transfer →';
+      }
+    });
+
+
+    async function loadPublicPaymentSettings() {
+  try {
+    const res = await fetch('/api/settings');
+    const data = await res.json();
+
+    if (data.success && data.settings) {
+      const s = data.settings;
+      const wire = s.wire_details || {};
+      const crypto = s.crypto_details || {};
+
+      // Update Bank Wire Display
+      if (document.getElementById('display-bank-name')) 
+        document.getElementById('display-bank-name').innerText = wire.bank_name || 'N/A';
+      
+      if (document.getElementById('display-account-name')) 
+        document.getElementById('display-account-name').innerText = wire.account_name || 'N/A';
+      
+      if (document.getElementById('display-account-number')) 
+        document.getElementById('display-account-number').innerText = wire.account_number || 'N/A';
+      
+      if (document.getElementById('display-swift-code')) 
+        document.getElementById('display-swift-code').innerText = wire.swift_code || 'N/A';
+      
+      if (document.getElementById('display-routing-number')) 
+        document.getElementById('display-routing-number').innerText = wire.routing_number || 'N/A';
+
+      // Update Crypto Display
+      if (document.getElementById('display-crypto-address')) 
+        document.getElementById('display-crypto-address').innerText = crypto.crypto_address || 'N/A';
+      
+      if (document.getElementById('display-crypto-network')) 
+        document.getElementById('display-crypto-network').innerText = crypto.crypto_network || 'N/A';
+    }
+  } catch (err) {
+    console.error('Failed to load payment settings:', err);
+  }
+}
+
+// Call on startup
+loadPublicPaymentSettings();
+
+
+
+  </script>
+</body>
+</html>

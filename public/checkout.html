@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | Trannity - Project Sunshine</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* Apple Liquid Glass Styling */
+    .glass-header {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      border-radius: 20px;
+      padding: 30px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.6) !important;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      border-radius: 12px !important;
+      padding: 12px 15px !important;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 0.95rem;
+    }
+
+    /* Payment Method Selection Cards */
+    .payment-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 15px 0 25px;
+    }
+
+    .method-card {
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.4);
+      padding: 16px;
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .method-card:hover {
+      background: rgba(255, 255, 255, 0.8);
+      border-color: var(--primary, #8B263E);
+    }
+
+    .method-card.selected {
+      border-color: var(--primary, #8B263E);
+      background: rgba(139, 38, 62, 0.05);
+      box-shadow: 0 4px 15px rgba(139, 38, 62, 0.1);
+    }
+
+    .method-card input[type="radio"] {
+      display: none;
+    }
+  </style>
+</head>
+<body style="background: linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%); min-height: 100vh;">
+
+  <!-- Header -->
+  <header class="glass-header">
+    <div class="container nav-wrapper" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+      <a href="/" class="logo" style="font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--primary, #8B263E);"> Trannity</a>
+      <a href="/donate.html" class="btn btn-secondary" style="padding: 8px 18px; border-radius: 8px; text-decoration: none;">← Change Amount</a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 750px; padding: 40px 20px 60px;">
+    <div class="glass-card">
+      
+      <!-- Amount Summary Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 15px;">
+        <div>
+          <h2 style="margin: 0; color: #1F2937;">Donor Details</h2>
+          <p style="margin: 4px 0 0; color: #6B7280; font-size: 0.9rem;">Project Sunshine Holiday Relief</p>
+        </div>
+        <span id="display-amount" style="font-size: 1.6rem; font-weight: 800; color: var(--primary, #8B263E);">$0.00</span>
+      </div>
+
+      <form id="checkout-form">
+        <!-- Contact Information -->
+        <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--primary, #8B263E);">1. Contact Information</h3>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px;">Full Name</label>
+            <input type="text" id="full_name" class="glass-input" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px;">Email Address</label>
+            <input type="email" id="email" class="glass-input" required placeholder="john@example.com">
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="margin-top: 15px;">
+          <div class="form-group">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px;">Phone Number</label>
+            <input type="tel" id="phone" class="glass-input" required placeholder="+1234567890">
+          </div>
+          <div class="form-group">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px;">Street Address</label>
+            <input type="text" id="address" class="glass-input" required placeholder="123 Main Street">
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="margin-top: 15px;">
+          <div class="form-group">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px;">City</label>
+            <input type="text" id="city" class="glass-input" required placeholder="City">
+          </div>
+          <div class="form-group">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px;">State / Province</label>
+            <input type="text" id="state" class="glass-input" required placeholder="State">
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="margin-top: 15px; margin-bottom: 30px;">
+          <div class="form-group">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px;">Country</label>
+            <input type="text" id="country" class="glass-input" required value="United States">
+          </div>
+          <div class="form-group">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px;">ZIP / Postal Code</label>
+            <input type="text" id="zip_code" class="glass-input" placeholder="00000">
+          </div>
+        </div>
+
+        <!-- Private Payment Method Selection -->
+        <h3 style="font-size: 1.05rem; margin-bottom: 10px; color: var(--primary, #8B263E);">2. Choose Payment Method</h3>
+        <div class="payment-options">
+          <label class="method-card selected" id="card-wire">
+            <input type="radio" name="payment_method" value="wire" checked>
+            <div style="font-size: 1.5rem; margin-bottom: 4px;">🏛️</div>
+            <strong style="display: block; color: #1F2937;">Bank Wire Transfer</strong>
+            <span style="font-size: 0.8rem; color: #6B7280;">Direct Bank Transfer</span>
+          </label>
+
+          <label class="method-card" id="card-crypto">
+            <input type="radio" name="payment_method" value="usdt">
+            <div style="font-size: 1.5rem; margin-bottom: 4px;">₮</div>
+            <strong style="display: block; color: #1F2937;">USDT (Base Network)</strong>
+            <span style="font-size: 0.8rem; color: #6B7280;">Crypto Transfer</span>
+          </label>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn" style="width: 100%; font-size: 1.15rem; padding: 16px; border-radius: 12px; cursor: pointer;">
+          Proceed to Payment Instructions →
+        </button>
+      </form>
+    </div>
+  </main>
+
+<script>
+  // 1. Fetch live payment gateway status from backend and update UI
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch('/api/campaign');
+      const data = await res.json();
+      
+      if (data.settings) {
+        const wireCard = document.getElementById('card-wire');
+        const cryptoCard = document.getElementById('card-crypto');
+        const wireInput = wireCard.querySelector('input');
+        const cryptoInput = cryptoCard.querySelector('input');
+
+        // Helper function to render a "Disabled" notification banner
+        const showDisabledNotice = (cardElement, methodName) => {
+          const notice = document.createElement('div');
+          notice.className = 'payment-disabled-notice';
+          notice.style.cssText = `
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            color: #856404;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          `;
+          notice.innerHTML = `⚠️ <span>${methodName} is currently unavailable. Please choose another payment method.</span>`;
+          cardElement.parentNode.insertBefore(notice, cardElement);
+          cardElement.style.display = 'none';
+        };
+
+        // Handle Bank Wire Transfer visibility & message
+        if (!data.settings.wire_enabled) {
+          wireInput.disabled = true;
+          wireInput.checked = false;
+          showDisabledNotice(wireCard, 'Bank Wire Transfer');
+        }
+
+        // Handle USDT Crypto visibility & message
+        if (!data.settings.crypto_enabled) {
+          cryptoInput.disabled = true;
+          cryptoInput.checked = false;
+          showDisabledNotice(cryptoCard, 'USDT Crypto');
+        }
+
+        // Auto-select the active method if the default (wire) was disabled
+        if (!data.settings.wire_enabled && data.settings.crypto_enabled) {
+          cryptoCard.classList.add('selected');
+          cryptoInput.checked = true;
+        } else if (data.settings.wire_enabled) {
+          wireCard.classList.add('selected');
+          wireInput.checked = true;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load gateway settings:', err);
+    }
+  });
+
+  // 2. Get chosen donation amount from sessionStorage (set in donate.html)
+  const selectedAmount = sessionStorage.getItem('donation_amount') || 2500;
+  document.getElementById('display-amount').innerText = `$${parseFloat(selectedAmount).toLocaleString()}`;
+
+  // 3. Handle Payment Method Selection Visuals
+  const methodCards = document.querySelectorAll('.method-card');
+  methodCards.forEach(card => {
+    card.addEventListener('click', () => {
+      // Ignore click if method is disabled
+      if (card.querySelector('input').disabled) return;
+
+      methodCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      card.querySelector('input[type="radio"]').checked = true;
+    });
+  });
+
+  // 4. Handle Form Submission
+  document.getElementById('checkout-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const selectedInput = document.querySelector('input[name="payment_method"]:checked');
+    if (!selectedInput) {
+      alert('No payment method is currently available. Please check back later.');
+      return;
+    }
+
+    const selectedMethod = selectedInput.value;
+
+    // Save donor details in sessionStorage to pass to instructions page
+    const donorData = {
+      amount: parseFloat(selectedAmount),
+      full_name: document.getElementById('full_name').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      address: document.getElementById('address').value,
+      city: document.getElementById('city').value,
+      state: document.getElementById('state').value,
+      country: document.getElementById('country').value,
+      zip_code: document.getElementById('zip_code').value || '00000',
+      payment_method: selectedMethod,
+      referral_code: localStorage.getItem('trannity_referral_code') || null
+    };
+
+    sessionStorage.setItem('donor_checkout_data', JSON.stringify(donorData));
+
+    // Redirect to payment instructions page based on chosen method
+    if (selectedMethod === 'wire') {
+      window.location.href = '/payment-wire.html';
+    } else {
+      window.location.href = '/payment-crypto.html';
+    }
+  });
+</script>
+</body>
+</html>
