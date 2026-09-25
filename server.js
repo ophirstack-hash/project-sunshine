@@ -11,6 +11,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-in-production';
 
+// Enable trust proxy for Render reverse proxy (fixes express-rate-limit error)
+app.set('trust proxy', 1);
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,12 +33,12 @@ app.get('/admin.html', (req, res) => {
   }
 });
 
-// Serve static HTML/CSS/JS files from the public directory
-app.use(express.static(path.join(__dirname, 'public')));
-
 // API Routes
 app.use('/api', apiRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Serve static HTML/CSS/JS files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Fallback to index.html for root or unknown paths
 app.use((req, res) => {
