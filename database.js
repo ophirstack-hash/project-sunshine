@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
+const bcrypt = require('bcryptjs');
 
-// Determine if SSL is needed based on NODE_ENV or remote connection string
 const isProduction = process.env.NODE_ENV === 'production' || (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('render.com'));
 
 const pool = new Pool({
@@ -8,12 +8,10 @@ const pool = new Pool({
   ssl: isProduction ? { rejectUnauthorized: false } : false
 });
 
-// Handle idle client connection errors to prevent unhandled process crashes
 pool.on('error', (err) => {
   console.error('Unexpected error on idle database client:', err);
 });
 
-// Initialize database tables using Postgres syntax
 async function initDb() {
   try {
     // 1. Campaign Table
@@ -109,12 +107,32 @@ async function initDb() {
       );
     `);
 
+    // 6. Admins Table (CRITICAL FIX FOR LOGIN)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admins (
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL
+      );
+    `);
+
+    const adminCheck = await pool.query('SELECT COUNT(*) FROM admins');
+    if (parseInt(adminCheck.rows[0].count, 10) === 0) {
+      const defaultPassword = process.env.ADMIN_PASSWORD || 'AdminPass123!';
+      const hash = await bcrypt.hash(defaultPassword, 10);
+      await pool.query(
+        `INSERT INTO admins (username, password_hash) VALUES ($1, $2)`,
+        ['creator1985', hash]
+      );
+      console.log('Default admin created -> Username: creator1985');
+    }
+
     console.log('PostgreSQL tables initialized successfully.');
   } catch (err) {
     console.error('Error initializing PostgreSQL tables:', err);
   }
 }
 
-initDb();
-
+// Direct Pool export guarantees backward compatibility across all routes
 module.exports = pool;
+module.exports.initDb = initDb;
