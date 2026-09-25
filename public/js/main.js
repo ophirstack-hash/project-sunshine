@@ -9,28 +9,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Fetch Live Campaign Data from API
 async function fetchCampaignStats() {
   try {
-    // Added ?t=Date.now() to prevent browser from caching old campaign target stats
     const response = await fetch(`/api/campaign?t=${Date.now()}`);
     if (!response.ok) throw new Error('Failed to fetch campaign data');
 
     const data = await response.json();
 
-    // Map database properties (fallback values handled gracefully)
     const raised = data.raised_amount || 0;
     const target = data.target_amount || data.goal_amount || 3000000;
     const donors = data.current_donors || data.donor_count || 0;
 
-    // Calculate completion percentage
     const percentage = Math.min(100, Math.round((raised / target) * 100));
 
-    // Target index.html DOM Elements
     const statRaised = document.getElementById('stat-raised');
     const statGoal = document.getElementById('stat-goal');
     const statDonors = document.getElementById('stat-donors');
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
 
-    // Update DOM UI
     if (statRaised) statRaised.innerText = `$${Number(raised).toLocaleString()}`;
     if (statGoal) statGoal.innerText = `$${Number(target).toLocaleString()}`;
     if (statDonors) statDonors.innerText = Number(donors).toLocaleString();
@@ -49,16 +44,16 @@ async function fetchCampaignStats() {
 // Handle Referral Codes & Admin Trackers
 async function handleReferrals() {
   const urlParams = new URLSearchParams(window.location.search);
-  // Check for both ?ref= and ?r= query parameters
   const refCode = urlParams.get('ref') || urlParams.get('r');
 
   if (!refCode) return;
 
-  // Persist referral code in localStorage for the donation page
+  // Sync keys across local storage and cookie for subpages
+  localStorage.setItem('trannity_referral_code', refCode);
   localStorage.setItem('trannity_ref_code', refCode);
+  document.cookie = `trannity_referral_code=${refCode}; path=/; max-age=2592000`;
 
   try {
-    // Record referral click count in backend & fetch referrer name
     const response = await fetch(`/api/referral/click/${encodeURIComponent(refCode)}`, {
       method: 'POST'
     });
@@ -67,7 +62,6 @@ async function handleReferrals() {
       const data = await response.json();
       const referrerName = data.referrer_name || 'a friend';
 
-      // Show welcome banner on index.html
       const banner = document.getElementById('referral-banner');
       if (banner) {
         banner.style.display = 'block';
@@ -87,7 +81,6 @@ async function handleReferrals() {
   }
 }
 
-// Helper utility to escape strings for security
 function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
