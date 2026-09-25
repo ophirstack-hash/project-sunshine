@@ -107,7 +107,7 @@ async function initDb() {
       );
     `);
 
-    // 6. Admins Table (CRITICAL FIX FOR LOGIN)
+    // 6. Admins Table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS admins (
         id SERIAL PRIMARY KEY,
@@ -124,7 +124,7 @@ async function initDb() {
         `INSERT INTO admins (username, password_hash) VALUES ($1, $2)`,
         ['creator1985', hash]
       );
-      console.log('Default admin created -> Username: creator1985');
+      console.log('Default admin account created -> Username: creator1985');
     }
 
     console.log('PostgreSQL tables initialized successfully.');
@@ -133,6 +133,5 @@ async function initDb() {
   }
 }
 
-// Direct Pool export guarantees backward compatibility across all routes
 module.exports = pool;
 module.exports.initDb = initDb;

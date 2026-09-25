@@ -4,6 +4,8 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
+// 1. Import initDb from database module
+const { initDb } = require('./database');
 const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
 
@@ -45,6 +47,8 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`[Trannity] Server running on http://localhost:${PORT}`);
+// 2. Bind to 0.0.0.0 and execute initDb() on startup
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[Trannity] Server running on port ${PORT}`);
+  initDb();
 });
