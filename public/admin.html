@@ -96,6 +96,19 @@
       <a href="/admin.html" class="logo" style="font-weight: 800; font-size: 1.3rem; text-decoration: none; color: var(--primary, #8B263E);">⚙️ Trannity Admin Panel</a>
       <a href="/" class="btn btn-secondary" style="padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; text-decoration: none;">View Site</a>
     </div>
+<!-- UPDATE THIS IN admin.html -->
+  <header class="glass-header">
+    <div class="container nav-wrapper" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+      <a href="/admin.html" class="logo" style="font-weight: 800; font-size: 1.3rem; text-decoration: none; color: var(--primary, #8B263E);">⚙️ Trannity Admin Panel</a>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <a href="/" class="btn btn-secondary" style="padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; text-decoration: none;">View Site</a>
+        <button onclick="logoutAdmin()" class="btn" style="padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; background: #DC2626; color: white; border: none; cursor: pointer;">Logout</button>
+      </div>
+    </div>
+</header>
+
+
+
   </header>
 
   <main class="container" style="max-width: 1200px; padding: 30px 20px 60px;">
@@ -456,6 +469,49 @@ loadCryptoDetails();
     }
 
     loadAdminData();
+
+
+// --- Logout Action ---
+async function logoutAdmin() {
+  // 1. Remove event listeners immediately so user interactions stop resetting the timer
+  ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
+    window.removeEventListener(event, resetInactivityTimer);
+  });
+  
+  // 2. Clear any pending timeout
+  clearTimeout(inactivityTimer);
+
+  // 3. Destroy session on server and redirect
+  try {
+    await fetch('/api/admin/logout', { method: 'POST' });
+  } catch (err) {
+    console.error('Error during logout:', err);
+  } finally {
+    window.location.href = '/admin-login.html';
+  }
+}
+
+// --- 6-Minute Inactivity Auto-Logout Timer ---
+let inactivityTimer;
+const INACTIVITY_TIMEOUT_MS = 6 * 60 * 1000; // 6 minutes
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    alert('Session expired due to 6 minutes of inactivity. Please log in again.');
+    logoutAdmin();
+  }, INACTIVITY_TIMEOUT_MS);
+}
+
+// Monitor user activity to reset the timer
+['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
+  window.addEventListener(event, resetInactivityTimer, { passive: true });
+});
+
+// Start the timer when page loads
+resetInactivityTimer();
+
+
   </script>
 </body>
 </html>

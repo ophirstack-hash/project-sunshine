@@ -128,47 +128,53 @@
   </main>
 
   <script>
-    // 1. Read URL query parameters passed from payment submission redirect
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlDonationId = urlParams.get('donationId') || urlParams.get('donation_id');
-    const urlRefCode = urlParams.get('ref') || urlParams.get('r');
+  // 1. Read URL query parameters passed from payment submission redirect
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlDonationId = urlParams.get('donation_id') || urlParams.get('donationId');
+  const urlRefCode = urlParams.get('ref') || urlParams.get('r');
+  const urlAmount = urlParams.get('amount');
+  const urlMethod = urlParams.get('method');
 
-    // 2. Read session storage summary
-    const rawSummary = sessionStorage.getItem('last_donation_summary');
-    let summary = {};
-    if (rawSummary) {
-      try { summary = JSON.parse(rawSummary); } catch (e) {}
-    }
+  // 2. Read session storage summary
+  const rawSummary = sessionStorage.getItem('last_donation_summary');
+  let summary = {};
+  if (rawSummary) {
+    try { summary = JSON.parse(rawSummary); } catch (e) {}
+  }
 
-    // Populate transaction fields
-    if (summary.amount) {
-      document.getElementById('summary-amount').innerText = `$${parseFloat(summary.amount).toLocaleString()}`;
-    }
-    document.getElementById('summary-method').innerText = summary.method || 'Crypto / Direct Transfer';
-    document.getElementById('summary-id').innerText = urlDonationId || summary.donationId || 'TRN-COMPLETED';
+  // Determine the active amount (URL param > session storage > 0)
+  const finalAmount = parseFloat(urlAmount || summary.amount || 0);
 
-    if (summary.status && summary.status.includes('Completed')) {
-      const statusEl = document.getElementById('summary-status');
-      statusEl.innerText = 'Completed & Verified';
-      statusEl.style.background = '#D1FAE5';
-      statusEl.style.color = '#065F46';
-    }
+  // Populate transaction fields
+  document.getElementById('summary-amount').innerText = `$${finalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  
+  if (urlMethod || summary.method) {
+    document.getElementById('summary-method').innerText = urlMethod || summary.method;
+  }
 
-    // 3. Resolve the donor's unique generated referral code
-    // Prioritize URL query param, then session storage, then local storage
-    const activeRefCode = urlRefCode || summary.referralCode || localStorage.getItem('trannity_user_ref_code') || 'SUNSHINE';
+  document.getElementById('summary-id').innerText = urlDonationId || summary.donationId || 'TRN-COMPLETED';
 
-    // 4. Generate dynamic share link matching current domain
-    const refUrl = `${window.location.origin}/?r=${encodeURIComponent(activeRefCode)}`;
-    document.getElementById('referral-link').value = refUrl;
+  if (summary.status && summary.status.includes('Completed')) {
+    const statusEl = document.getElementById('summary-status');
+    statusEl.innerText = 'Completed & Verified';
+    statusEl.style.background = '#D1FAE5';
+    statusEl.style.color = '#065F46';
+  }
 
-    // 5. Copy link handler
-    document.getElementById('copy-ref-btn').addEventListener('click', () => {
-      navigator.clipboard.writeText(refUrl);
-      const btn = document.getElementById('copy-ref-btn');
-      btn.innerText = 'Copied!';
-      setTimeout(() => btn.innerText = 'Copy Link', 2000);
-    });
-  </script>
+  // 3. Resolve the donor's unique generated referral code
+  const activeRefCode = urlRefCode || summary.referralCode || localStorage.getItem('trannity_user_ref_code') || 'SUNSHINE';
+
+  // 4. Generate dynamic share link matching current domain
+  const refUrl = `${window.location.origin}/?r=${encodeURIComponent(activeRefCode)}`;
+  document.getElementById('referral-link').value = refUrl;
+
+  // 5. Copy link handler
+  document.getElementById('copy-ref-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(refUrl);
+    const btn = document.getElementById('copy-ref-btn');
+    btn.innerText = 'Copied!';
+    setTimeout(() => btn.innerText = 'Copy Link', 2000);
+  });
+</script>
 </body>
 </html>
