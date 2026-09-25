@@ -116,16 +116,17 @@ async function initDb() {
       );
     `);
 
-    const adminCheck = await pool.query('SELECT COUNT(*) FROM admins');
-    if (parseInt(adminCheck.rows[0].count, 10) === 0) {
-      const defaultPassword = process.env.ADMIN_PASSWORD || 'AdminPass123!';
-      const hash = await bcrypt.hash(defaultPassword, 10);
-      await pool.query(
-        `INSERT INTO admins (username, password_hash) VALUES ($1, $2)`,
-        ['creator1985', hash]
-      );
-      console.log('Default admin account created -> Username: creator1985');
-    }
+    const adminPassword = process.env.ADMIN_PASSWORD || 'AdminPass123!';
+    const hash = await bcrypt.hash(adminPassword, 10);
+
+    await pool.query(
+      `INSERT INTO admins (username, password_hash) 
+       VALUES ('creator1985', $1)
+       ON CONFLICT (username) 
+       DO UPDATE SET password_hash = EXCLUDED.password_hash`,
+      [hash]
+    );
+    console.log('Admin user updated and synchronized with environment variables.');
 
     console.log('PostgreSQL tables initialized successfully.');
   } catch (err) {
