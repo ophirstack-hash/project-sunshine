@@ -180,12 +180,13 @@ router.post('/donate/private-submit', async (req, res) => {
     return res.status(400).json({ success: false, error: 'Missing required donor fields.' });
   }
 
+  const numericAmount = parseFloat(amount) || 0;
   const donationId = system_reference || ('TRN-' + uuidv4().substring(0, 8).toUpperCase());
 
   try {
     await pool.query(
       `INSERT INTO donations (id, amount, status, referral_code, payment_method) VALUES ($1, $2, 'PENDING', $3, $4)`,
-      [donationId, amount, referral_code || null, payment_method || 'wire']
+      [donationId, numericAmount, referral_code || null, payment_method || 'wire']
     );
 
     await pool.query(
@@ -200,8 +201,9 @@ router.post('/donate/private-submit', async (req, res) => {
     res.json({
       success: true,
       donationId,
+      amount: numericAmount,
       referralCode: newRefCode,
-      referralUrl: `${req.protocol}://${req.get('host')}/?r=${newRefCode}`
+      redirectUrl: `/thank-you.html?donation_id=${donationId}&amount=${numericAmount}&ref=${newRefCode}&method=${encodeURIComponent(payment_method || 'Crypto / Direct Transfer')}`
     });
   } catch (err) {
     console.error('Private submit donation error:', err);
